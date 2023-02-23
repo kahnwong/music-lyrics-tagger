@@ -1,10 +1,12 @@
 import glob
 import logging as log
+from typing import Dict
 from typing import List
 
+import azapi
 import mutagen
 
-# import azapi
+
 log.basicConfig(format="%(asctime)s - [%(levelname)s] %(message)s", level=log.DEBUG)
 
 
@@ -19,7 +21,7 @@ def _get_files(path: str) -> List[str]:
     return files
 
 
-def _get_metadata(file: str):
+def _get_metadata(file: str) -> Dict[str, str]:
     metadata = mutagen.File(file).tags
     # print(metadata.keys())
     extension = file.split(".")[-1]
@@ -27,9 +29,20 @@ def _get_metadata(file: str):
     if extension == "m4a":
         return {
             "extension": extension,
-            "artist": metadata["©ART"],
-            "title": metadata["©nam"],
+            "artist": metadata["©ART"][0],
+            "title": metadata["©nam"][0],
         }
+
+
+def _get_lyrics(metadata: Dict[str, str]) -> str:
+    API = azapi.AZlyrics("google", accuracy=0.5)
+
+    API.artist = metadata["artist"]
+    API.title = metadata["title"]
+
+    API.getLyrics()
+
+    return API.lyrics
 
 
 if __name__ == "__main__":
@@ -40,6 +53,7 @@ if __name__ == "__main__":
     for i in files:
         log.info(f"Processing: {i}")
 
-        print(_get_metadata(i))
+        metadata = _get_metadata(i)
+        lyrics = _get_lyrics(metadata)
 
         break
