@@ -1,0 +1,13 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+mutagen = "==1.46.0"
+azapi = "==3.0.8"
+
+[dev-packages]
+
+[requires]
+python_version = "3.11"
