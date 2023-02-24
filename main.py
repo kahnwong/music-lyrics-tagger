@@ -1,13 +1,19 @@
 import glob
 import logging as log
+import os
+import re
+from random import random
+from time import sleep
 from typing import Dict
 from typing import List
 
 import azapi
+import lyricsgenius
 import mutagen
+from tqdm import tqdm
 
 
-log.basicConfig(format="%(asctime)s - [%(levelname)s] %(message)s", level=log.DEBUG)
+log.basicConfig(format="%(asctime)s - [%(levelname)s] %(message)s", level=log.INFO)
 
 
 def _get_files(path: str) -> List[str]:
@@ -18,42 +24,82 @@ def _get_files(path: str) -> List[str]:
     for i in search_patterns:
         files.extend(glob.glob(i, recursive=True))
 
-    return files
+    return [i for i in files if "Instrumental" not in i]
 
 
 def _get_metadata(file: str) -> Dict[str, str]:
     metadata = mutagen.File(file).tags
     # print(metadata.keys())
-    extension = file.split(".")[-1]
 
+    extension = file.split(".")[-1]
     if extension == "m4a":
         return {
-            "extension": extension,
-            "artist": metadata["©ART"][0],
+            # "extension": extension,
+            "artist": metadata["aART"][0],
             "title": metadata["©nam"][0],
         }
 
 
-def _get_lyrics(metadata: Dict[str, str]) -> str:
-    API = azapi.AZlyrics("google", accuracy=0.5)
+def _get_lyrics(metadata: Dict[str, str], provider: str = "genius") -> str:
+    ################################################################
+    if provider == "genius":
+        genius = lyricsgenius.Genius(os.getenv("GENIUS_TOKEN"))
 
-    API.artist = metadata["artist"]
-    API.title = metadata["title"]
+        song = genius.search_song(metadata["title"].split("(")[0], metadata["artist"])
 
-    API.getLyrics()
+        lyrics = (
+            song.lyrics.replace(f"{song.title} Lyrics", "")
+            .replace("You might also like", "")
+            .replace("Embed", "")
+        )
 
-    return API.lyrics
+    ################################################################
+    elif provider == "azlyrics":
+        API = azapi.AZlyrics("google", accuracy=0.5)
+
+        API.artist = metadata["artist"]
+        API.title = metadata["title"].split("(")[0]
+
+        API.getLyrics()
+
+        lyrics = API.lyrics
+
+    ################################################################
+
+    lyrics = "\r\n".join(lyrics.splitlines())
+    lyrics = re.sub(r"\d+$", "", lyrics)
+
+    return lyrics
+
+
+def _write_lyrics(file: str, lyrics: str):
+    metadata = mutagen.File(file)
+
+    extension = file.split(".")[-1]
+    if extension == "m4a":
+        metadata["©lyr"] = [lyrics]
+
+    metadata.save()
 
 
 if __name__ == "__main__":
-    path = r"D:\Music\# Rock\Amanda Somerville"
-    # path = r"D:\# tagginig\Music\z-staging\Avril Lavigne"
-    files = _get_files(path)
+    with open("folders.txt", "r", encoding="utf-8") as f:
+        paths = [i.strip() for i in f.readlines()]
 
-    for i in files:
-        log.info(f"Processing: {i}")
+    for path in paths:
+        files = _get_files(path)
 
-        metadata = _get_metadata(i)
-        lyrics = _get_lyrics(metadata)
+        for i in (t := tqdm(files)):
+            t.set_description(f"Processing: {i}")
 
-        break
+            metadata = _get_metadata(i)
+
+            try:
+                lyrics = _get_lyrics(metadata)
+                _write_lyrics(file=i, lyrics=lyrics)
+
+                sleep(3 * random())
+            except AttributeError:  # couldn't find lyrics
+                pass
+
+            # break

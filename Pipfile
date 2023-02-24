@@ -6,6 +6,8 @@ name = "pypi"
 [packages]
 mutagen = "==1.46.0"
 azapi = "==3.0.8"
+lyricsgenius = "*"
+tqdm = "*"
 
 [dev-packages]
 
