@@ -1,3 +1,4 @@
+import contextlib
 import glob
 import logging as log
 import os
@@ -15,9 +16,21 @@ from tqdm import tqdm
 
 log.basicConfig(format="%(asctime)s - [%(levelname)s] %(message)s", level=log.INFO)
 
+########################
+# init provider choice
+########################
+lyrics_provider = os.getenv("lyrics_provider")
 
+########################
+# init genius provider
+########################
+genius = lyricsgenius.Genius(os.getenv("GENIUS_TOKEN"))
+
+########################
+# helpers
+########################
 def _get_files(path: str) -> List[str]:
-    extensions = ["mp3", "flac", "m4a"]
+    extensions = ["flac", "m4a"]
     search_patterns = [f"{path}/**/*.{ext}" for ext in extensions]
     log.debug(f"search pattern: {search_patterns}")
 
@@ -47,21 +60,13 @@ def _get_metadata(file: str) -> Dict[str, str]:
         }
 
 
-def _get_lyrics(metadata: Dict[str, str], provider: str = "genius") -> str:
+def _get_lyrics(
+    metadata: Dict[str, str],
+    provider: str = lyrics_provider,
+    genius: lyricsgenius.Genius = genius,
+) -> str:
     ################################################################
-    if provider == "genius":
-        genius = lyricsgenius.Genius(os.getenv("GENIUS_TOKEN"))
-
-        song = genius.search_song(metadata["title"].split("(")[0], metadata["artist"])
-
-        lyrics = (
-            song.lyrics.replace(f"{song.title} Lyrics", "")
-            .replace("You might also like", "")
-            .replace("Embed", "")
-        )
-
-    ################################################################
-    elif provider == "azlyrics":
+    if provider == "azlyrics":
         API = azapi.AZlyrics("google", accuracy=0.5)
 
         API.artist = metadata["artist"]
@@ -71,12 +76,20 @@ def _get_lyrics(metadata: Dict[str, str], provider: str = "genius") -> str:
 
         lyrics = API.lyrics
 
+    elif provider == "genius":
+        song = genius.search_song(
+            metadata["title"].split("(")[0].split("-")[0], metadata["artist"]
+        )
+
+        lyrics = (
+            song.lyrics.replace(f"{song.title} Lyrics", "")
+            .replace("You might also like", "")
+            .replace("Embed", "")
+        )
     ################################################################
 
     lyrics = "\r\n".join(lyrics.splitlines())
-    lyrics = re.sub(r"\d+$", "", lyrics)
-
-    return lyrics
+    return re.sub(r"\d+$", "", lyrics)
 
 
 def _write_lyrics(file: str, lyrics: str):
@@ -91,6 +104,9 @@ def _write_lyrics(file: str, lyrics: str):
     metadata.save()
 
 
+########################
+# main
+########################
 if __name__ == "__main__":
     with open("folders.txt", "r", encoding="utf-8") as f:
         paths = [i.strip() for i in f.readlines()]
@@ -105,12 +121,10 @@ if __name__ == "__main__":
             metadata = _get_metadata(i)
             log.debug(metadata)
 
-            try:
-                lyrics = _get_lyrics(metadata, provider="azlyrics")
+            with contextlib.suppress(AttributeError, TimeoutError, IndexError):
+                lyrics = _get_lyrics(metadata)
                 _write_lyrics(file=i, lyrics=lyrics)
 
                 sleep(3 * random())
-            except AttributeError:  # couldn't find lyrics
-                pass
 
             # break
