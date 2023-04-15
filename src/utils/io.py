@@ -12,18 +12,22 @@ log.basicConfig(format="%(asctime)s - [%(levelname)s] %(message)s", level=log.IN
 ##################
 # read
 ##################
-def get_files(path: str) -> List[str]:
-    extensions = ["flac", "m4a"]
-    search_patterns = [f"{path}/**/*.{ext}" for ext in extensions]
-    log.debug(f"search pattern: {search_patterns}")
-
+def get_files(paths: List[str]) -> List[str]:
     files = []
-    for i in search_patterns:
-        files.extend(glob.glob(i, recursive=True))
+
+    for path in paths:
+        extensions = ["flac", "m4a"]
+        search_patterns = [f"{path}/**/*.{ext}" for ext in extensions]
+        log.debug(f"search pattern: {search_patterns}")
+
+        for i in search_patterns:
+            matched_files = glob.glob(i, recursive=True)
+            matched_files = [i for i in matched_files if "Instrumental" not in i]
+            files.extend(matched_files)
 
     log.debug(f"files: {files}")
 
-    return [i for i in files if "Instrumental" not in i]
+    return files
 
 
 def get_metadata(file: str) -> Dict[str, str]:

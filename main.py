@@ -71,20 +71,18 @@ if __name__ == "__main__":
     with open("folders.txt", "r", encoding="utf-8") as f:
         paths = [i.strip() for i in f.readlines()]
 
-    for path in paths:
-        files = get_files(path)
+    files = get_files(paths)
 
-        for i in (t := tqdm(files)):
-            t.set_description(f"Processing: {i}")
-            # print(i)
+    for i in (t := tqdm(files)):
+        t.set_description(f"Processing: {i}")
 
-            metadata = get_metadata(i)
-            log.debug(metadata)
+        metadata = get_metadata(i)
+        log.debug(metadata)
 
-            with contextlib.suppress(AttributeError, TimeoutError, IndexError):
-                lyrics = _get_lyrics(metadata)
-                write_lyrics(file=i, lyrics=lyrics)
+        with contextlib.suppress(AttributeError, TimeoutError, IndexError):
+            lyrics = _get_lyrics(metadata)
+            write_lyrics(file=i, lyrics=lyrics)
 
-                sleep(3 * random())
+            sleep(3 * random())
 
-            # break
+        # break
