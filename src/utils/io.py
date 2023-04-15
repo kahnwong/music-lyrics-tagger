@@ -1,12 +1,10 @@
 import glob
-import logging as log
 from typing import Dict
 from typing import List
 
 import mutagen
 
-
-log.basicConfig(format="%(asctime)s - [%(levelname)s] %(message)s", level=log.INFO)
+from src.utils.log import log
 
 
 ##################

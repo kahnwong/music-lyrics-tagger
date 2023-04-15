@@ -1,4 +1,3 @@
-import logging as log
 import os
 import re
 from typing import Dict
@@ -6,8 +5,8 @@ from typing import Dict
 import azapi
 import lyricsgenius
 
+from src.utils.log import log
 
-log.basicConfig(format="%(asctime)s - [%(levelname)s] %(message)s", level=log.INFO)
 
 ########################
 # init lyrics providers
