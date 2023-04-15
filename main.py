@@ -17,13 +17,14 @@ from tqdm import tqdm
 log.basicConfig(format="%(asctime)s - [%(levelname)s] %(message)s", level=log.INFO)
 
 ########################
-# init provider choice
+# init lyrics providers
 ########################
-lyrics_provider = os.getenv("lyrics_provider")
+lyrics_provider = os.getenv("LYRICS_PROVIDER")
 
 ########################
 # init genius provider
 ########################
+azlyrics = azapi.AZlyrics("google", accuracy=0.5)
 genius = lyricsgenius.Genius(os.getenv("GENIUS_TOKEN"))
 
 ########################
@@ -48,15 +49,16 @@ def _get_metadata(file: str) -> Dict[str, str]:
     log.debug(f"metadata keys: {metadata.keys()}")
 
     extension = file.split(".")[-1]
-    if extension == "m4a":
-        return {
-            "artist": metadata["aART"][0],
-            "title": metadata["©nam"][0],
-        }
-    elif extension == "flac":
+
+    if extension == "flac":
         return {
             "artist": metadata["albumartist"][0],
             "title": metadata["title"][0],
+        }
+    elif extension == "m4a":
+        return {
+            "artist": metadata["aART"][0],
+            "title": metadata["©nam"][0],
         }
 
 
@@ -64,17 +66,16 @@ def _get_lyrics(
     metadata: Dict[str, str],
     provider: str = lyrics_provider,
     genius: lyricsgenius.Genius = genius,
+    azlyrics: azapi.AZlyrics = azlyrics,
 ) -> str:
     ################################################################
     if provider == "azlyrics":
-        API = azapi.AZlyrics("google", accuracy=0.5)
+        azlyrics.artist = metadata["artist"]
+        azlyrics.title = metadata["title"].split("(")[0]
 
-        API.artist = metadata["artist"]
-        API.title = metadata["title"].split("(")[0]
+        azlyrics.getLyrics()
 
-        API.getLyrics()
-
-        lyrics = API.lyrics
+        lyrics = azlyrics.lyrics
 
     elif provider == "genius":
         song = genius.search_song(
@@ -96,10 +97,10 @@ def _write_lyrics(file: str, lyrics: str):
     metadata = mutagen.File(file)
 
     extension = file.split(".")[-1]
-    if extension == "m4a":
-        metadata["©lyr"] = [lyrics]
-    elif extension == "flac":
+    if extension == "flac":
         metadata["unsyncedlyrics"] = [lyrics]
+    elif extension == "m4a":
+        metadata["©lyr"] = [lyrics]
 
     metadata.save()
 
@@ -116,7 +117,7 @@ if __name__ == "__main__":
 
         for i in (t := tqdm(files)):
             t.set_description(f"Processing: {i}")
-            print(i)
+            # print(i)
 
             metadata = _get_metadata(i)
             log.debug(metadata)
