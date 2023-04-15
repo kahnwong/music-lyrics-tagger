@@ -44,6 +44,8 @@ def get_lyrics(
             song.lyrics.replace(f"{song.title} Lyrics", "")
             .replace("You might also like", "")
             .replace("Embed", "")
+            .replace("TranslationsEnglishRomanization", "")
+            .replace("TranslationsRomanization", "")
         )
     ################################################################
 

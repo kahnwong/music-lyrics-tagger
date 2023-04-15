@@ -5,6 +5,7 @@ from time import sleep
 from tqdm import tqdm
 
 from src.utils.io import get_files
+from src.utils.io import get_lyrics_from_tag
 from src.utils.io import get_metadata
 from src.utils.io import write_lyrics
 from src.utils.lyrics import get_lyrics
@@ -20,11 +21,13 @@ if __name__ == "__main__":
         t.set_description(f"Processing: {i}")
 
         metadata = get_metadata(i)
+        if lyrics_from_tag := get_lyrics_from_tag(i):
+            write_lyrics(file=i, lyrics=lyrics_from_tag)
+        else:
+            with contextlib.suppress(AttributeError, TimeoutError, IndexError):
+                lyrics = get_lyrics(metadata)
+                write_lyrics(file=i, lyrics=lyrics)
 
-        with contextlib.suppress(AttributeError, TimeoutError, IndexError):
-            lyrics = get_lyrics(metadata)
-            write_lyrics(file=i, lyrics=lyrics)
-
-            sleep(3 * random())
+                sleep(3 * random())
 
         # break
