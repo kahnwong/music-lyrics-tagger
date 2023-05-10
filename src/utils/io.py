@@ -54,16 +54,25 @@ def get_lyrics_from_tag(file: str) -> str:
     metadata = mutagen.File(file).tags
     log.debug(f"metadata keys: {metadata.keys()}")
 
-    # if you convert between formats,
-    # the lyrics attr might not be correctly transferred
-    if metadata.get("unsyncedlyrics"):
-        lyrics = metadata.get("unsyncedlyrics")[0]
-    elif metadata.get("----:com.apple.iTunes:unsyncedlyrics"):
-        lyrics = metadata.get("----:com.apple.iTunes:unsyncedlyrics")[0].decode("utf-8")
-    elif metadata.get("----:com.apple.iTunes:UNSYNCEDLYRICS"):
-        lyrics = metadata.get("----:com.apple.iTunes:UNSYNCEDLYRICS")[0].decode("utf-8")
-    elif metadata.get("©lyr"):
-        lyrics = metadata.get("©lyr")[0]
+    extension = file.split(".")[-1]
+
+    if extension == "m4a":
+        # if you convert between formats,
+        # the lyrics attr might not be correctly transferred
+        if metadata.get("unsyncedlyrics"):
+            lyrics = metadata.get("unsyncedlyrics")[0]
+        elif metadata.get("----:com.apple.iTunes:unsyncedlyrics"):
+            lyrics = metadata.get("----:com.apple.iTunes:unsyncedlyrics")[0].decode(
+                "utf-8"
+            )
+        elif metadata.get("----:com.apple.iTunes:UNSYNCEDLYRICS"):
+            lyrics = metadata.get("----:com.apple.iTunes:UNSYNCEDLYRICS")[0].decode(
+                "utf-8"
+            )
+        elif metadata.get("©lyr"):
+            lyrics = metadata.get("©lyr")[0]
+        else:
+            lyrics = None
     else:
         lyrics = None
 
@@ -87,14 +96,14 @@ def write_lyrics(file: str, lyrics: str):
     if extension == "flac":
         metadata["unsyncedlyrics"] = [lyrics]
 
-        with contextlib.suppress(KeyError):
+        with contextlib.suppress(KeyError, ValueError):
             metadata.pop("©lyr")
     elif extension == "m4a":
         metadata["©lyr"] = [lyrics]
 
-        with contextlib.suppress(KeyError):
+        with contextlib.suppress(KeyError, ValueError):
             metadata.pop("----:com.apple.iTunes:unsyncedlyrics")
 
-        with contextlib.suppress(KeyError):
+        with contextlib.suppress(KeyError, ValueError):
             metadata.pop("----:com.apple.iTunes:UNSYNCEDLYRICS")
     metadata.save()
