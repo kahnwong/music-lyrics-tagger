@@ -47,6 +47,8 @@ def get_lyrics(
             .replace("TranslationsEnglishRomanization", "")
             .replace("TranslationsRomanization", "")
         )
+
+        lyrics = re.sub(r"^[0-9]+ Contributor(s?)", "", lyrics)
     ################################################################
 
     lyrics = "\r\n".join(lyrics.splitlines())
