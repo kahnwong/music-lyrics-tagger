@@ -16,4 +16,11 @@ pipenv install
 
 1. Put `$path` in `folders.txt`. Can contain multiple paths. (Sometimes the script won't register a path if it contains certain characters, I haven't tested them all, but renaming the said folders should do the trick.)
 
-2. `pipenv run python main.py` (`.env` content would be automatically registered via `pipenv`, even when you're on Windows.)
+2. `pipenv run python main.py` (`.env` content would be automatically registered via `pipenv`, even when you're on Windows.
+
+Required ENV
+
+```env
+GENIUS_TOKEN=      # required if you want to fetch lyrics from genius
+LYRICS_PROVIDER=   # `genius` or `azlyrics`
+```
