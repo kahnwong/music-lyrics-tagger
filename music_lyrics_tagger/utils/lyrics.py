@@ -6,7 +6,7 @@ import azapi
 import lyricsgenius
 from dotenv import load_dotenv
 
-from src.utils.log import log
+from music_lyrics_tagger.utils.log import log
 
 load_dotenv()
 

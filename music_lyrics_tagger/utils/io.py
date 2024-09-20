@@ -5,7 +5,7 @@ from typing import List
 
 import mutagen
 
-from src.utils.log import log
+from music_lyrics_tagger.utils.log import log
 
 
 ##################

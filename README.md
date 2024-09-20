@@ -12,7 +12,7 @@ uv sync
 
 1. Put `$path` in `folders.txt`. Can contain multiple paths. (Sometimes the script won't register a path if it contains certain characters, I haven't tested them all, but renaming the said folders should do the trick.)
 
-2. `uv run python main.py`
+2. `uv run python music_lyrics_tagger/main.py`
 
 Required ENV
 

@@ -4,11 +4,11 @@ from time import sleep
 
 from tqdm import tqdm
 
-from src.utils.io import get_files
-from src.utils.io import get_lyrics_from_tag
-from src.utils.io import get_metadata
-from src.utils.io import write_lyrics
-from src.utils.lyrics import get_lyrics
+from music_lyrics_tagger.utils.io import get_files
+from music_lyrics_tagger.utils.io import get_lyrics_from_tag
+from music_lyrics_tagger.utils.io import get_metadata
+from music_lyrics_tagger.utils.io import write_lyrics
+from music_lyrics_tagger.utils.lyrics import get_lyrics
 
 
 if __name__ == "__main__":
