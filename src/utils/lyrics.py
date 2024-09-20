@@ -4,8 +4,11 @@ from typing import Dict
 
 import azapi
 import lyricsgenius
+from dotenv import load_dotenv
 
 from src.utils.log import log
+
+load_dotenv()
 
 
 ########################

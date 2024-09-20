@@ -1,1 +1,1 @@
-pipenv run python main.py
+uv run python main.py

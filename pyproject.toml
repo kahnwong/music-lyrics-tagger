@@ -1,0 +1,13 @@
+[project]
+name = "music-lyrics-tagger"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "azapi>=3.0.8",
+    "lyricsgenius>=3.0.1",
+    "mutagen>=1.47.0",
+    "python-dotenv>=1.0.1",
+    "tqdm>=4.66.5",
+]
