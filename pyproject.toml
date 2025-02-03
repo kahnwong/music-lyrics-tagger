@@ -1,17 +1,34 @@
 [project]
 name = "music-lyrics-tagger"
-version = "0.1.0"
-description = "Add your description here"
+version = "0.1"
+description = ""
 readme = "README.md"
-requires-python = ">=3.12"
+authors = [{name = "Karn Wong"}]
+requires-python = ">=3.13"
 dependencies = [
     "azapi>=3.0.8",
-    "lyricsgenius>=3.0.1",
+    "click",
+    "lyricsgenius>=3.2.0",
     "mutagen>=1.47.0",
-    "python-dotenv>=1.0.1",
-    "tqdm>=4.66.5",
+    "pyyaml>=6.0.2",
+    "tqdm>=4.67.1",
 ]
 
 [build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[dependency-groups]
+dev = [
+    "mypy>=1.14.1",
+    "pytest>=8.3.4",
+]
+
+[project.urls]
+Homepage = "https://github.com/kahnwong/music-lyrics-tagger"
+
+[project.scripts]
+music-lyrics-tagger = "music_lyrics_tagger.cli:cli"
+
+[project.optional-dependencies]
+test = ["pytest"]

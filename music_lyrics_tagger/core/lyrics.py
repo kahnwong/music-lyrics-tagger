@@ -4,24 +4,20 @@ from typing import Dict
 
 import azapi
 import lyricsgenius
-from dotenv import load_dotenv
 
-from music_lyrics_tagger.utils.log import log
-
-load_dotenv()
-
+from music_lyrics_tagger.core import app_config
 
 ########################
 # init lyrics providers
 ########################
-lyrics_provider = os.getenv("LYRICS_PROVIDER")
+lyrics_provider = app_config["LYRICS_PROVIDER"]  # `azlyrics` or `genius`
 
 azlyrics = azapi.AZlyrics("google", accuracy=0.5)
-genius = lyricsgenius.Genius(os.getenv("GENIUS_TOKEN"))
+genius = lyricsgenius.Genius(app_config["GENIUS_TOKEN"])
 
 
 ########################
-# functions
+# methods
 ########################
 def get_lyrics(
     metadata: Dict[str, str],
@@ -30,6 +26,7 @@ def get_lyrics(
     azlyrics: azapi.AZlyrics = azlyrics,
 ) -> str:
     ################################################################
+    lyrics = ""
     if provider == "azlyrics":
         azlyrics.artist = metadata["artist"]
         azlyrics.title = metadata["title"].split("(")[0]
@@ -39,9 +36,7 @@ def get_lyrics(
         lyrics = azlyrics.lyrics
 
     elif provider == "genius":
-        song = genius.search_song(
-            metadata["title"].split("(")[0].split("-")[0], metadata["artist"]
-        )
+        song = genius.search_song(metadata["title"].split("(")[0], metadata["artist"])
 
         lyrics = (
             song.lyrics.replace(f"{song.title} Lyrics", "")
@@ -55,6 +50,5 @@ def get_lyrics(
     ################################################################
 
     lyrics = "\r\n".join(lyrics.splitlines())
-    log.debug(lyrics)
 
     return re.sub(r"\d+$", "", lyrics)

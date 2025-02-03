@@ -1,7 +1,6 @@
----
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.6.0
+    rev: v5.0.0
     hooks:
       - id: trailing-whitespace
       - id: end-of-file-fixer
@@ -15,26 +14,12 @@ repos:
       - id: detect-private-key
       - id: fix-byte-order-marker
       - id: mixed-line-ending
-  # ----------------------- OPS -----------------------
-  - repo: https://github.com/jumanjihouse/pre-commit-hook-yamlfmt
-    rev: 0.2.3
+  - repo: https://github.com/kahnwong/pre-commit
+    rev: "ef85163"
     hooks:
+      - id: ruff-check
+      - id: ruff-format
+      - id: uv-lock
+        #      - id: mypy
       - id: yamlfmt
-        args: [--mapping, "2", --sequence, "4", --offset, "2", --width, "150", --preserve-quotes]
-        exclude: ^.github/dependabot.yaml
-#        exclude: (sops\.yaml)$
-  # ------------------------- PYTHON ------------------------
-  - repo: https://github.com/psf/black
-    rev: 24.8.0
-    hooks:
-      - id: black
-  - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: v0.5.7
-    hooks:
-      - id: ruff
-        args: ["--fix", "--ignore=E402,E501"]
-        exclude: ^migrations/
-  - repo: https://github.com/asottile/reorder_python_imports
-    rev: v3.13.0
-    hooks:
-      - id: reorder-python-imports
+      - id: trufflehog
