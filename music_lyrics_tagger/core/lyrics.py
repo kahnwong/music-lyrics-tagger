@@ -37,16 +37,19 @@ def get_lyrics(
 
     elif provider == "genius":
         song = genius.search_song(metadata["title"].split("(")[0], metadata["artist"])
+        lyrics = ""
+        try:
+            lyrics = (
+                song.lyrics.replace(f"{song.title} Lyrics", "")
+                .replace("You might also like", "")
+                .replace("Embed", "")
+                .replace("TranslationsEnglishRomanization", "")
+                .replace("TranslationsRomanization", "")
+            )
 
-        lyrics = (
-            song.lyrics.replace(f"{song.title} Lyrics", "")
-            .replace("You might also like", "")
-            .replace("Embed", "")
-            .replace("TranslationsEnglishRomanization", "")
-            .replace("TranslationsRomanization", "")
-        )
-
-        lyrics = re.sub(r"^[0-9]+ Contributor(s?)", "", lyrics)
+            lyrics = re.sub(r"^[0-9]+ Contributor(s?)", "", lyrics)
+        except AttributeError:
+            pass
     ################################################################
 
     lyrics = "\r\n".join(lyrics.splitlines())
