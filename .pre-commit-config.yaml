@@ -15,11 +15,11 @@ repos:
       - id: fix-byte-order-marker
       - id: mixed-line-ending
   - repo: https://github.com/kahnwong/pre-commit
-    rev: "ef85163"
+    rev: "9028398"
     hooks:
       - id: ruff-check
       - id: ruff-format
       - id: uv-lock
         #      - id: mypy
       - id: yamlfmt
-      - id: trufflehog
+      - id: kingfisher
