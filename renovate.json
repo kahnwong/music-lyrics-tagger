@@ -1,4 +1,98 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:recommended", "group:allNonMajor"]
+  "extends": [
+    "config:recommended",
+    "group:allNonMajor"
+  ],
+  "regexManagers": [
+    {
+      "fileMatch": [
+        "(^|/)rust-toolchain\\.toml$",
+        "(^|/)rust-toolchain$"
+      ],
+      "matchStrings": [
+        "channel\\s*=\\s*\"(?<currentValue>.*)\""
+      ],
+      "depNameTemplate": "rust",
+      "datasourceTemplate": "docker",
+      "packageNameTemplate": "docker.io/library/rust",
+      "versioningTemplate": "docker"
+    },
+    {
+      "fileMatch": [
+        "(^|/)\\.python-version$"
+      ],
+      "matchStrings": [
+        "^(?<currentValue>.+)$"
+      ],
+      "depNameTemplate": "python",
+      "datasourceTemplate": "docker",
+      "packageNameTemplate": "docker.io/library/python",
+      "versioningTemplate": "docker"
+    },
+    {
+      "fileMatch": [
+        "(^|/)[Dd]ockerfile$",
+        "(^|/)[Dd]ockerfile\\.[a-zA-Z0-9-]+$"
+      ],
+      "matchStrings": [
+        "FROM ghcr\\.io/astral-sh/uv:(?<currentValue>python\\d+\\.\\d+-bookworm-slim)"
+      ],
+      "depNameTemplate": "ghcr.io/astral-sh/uv",
+      "datasourceTemplate": "docker",
+      "versioningTemplate": "regex:^python(?<major>\\d+)\\.(?<minor>\\d+)-bookworm-slim$"
+    }
+  ],
+  "packageRules": [
+    {
+      "matchManagers": [
+        "gomod",
+        "dockerfile"
+      ],
+      "matchPackageNames": [
+        "go",
+        "golang",
+        "docker.io/library/golang"
+      ],
+      "groupName": "go version",
+      "separateMinorPatch": true,
+      "rangeStrategy": "bump",
+      "commitMessageTopic": "go",
+      "commitMessageExtra": "to {{{newVersion}}}"
+    },
+    {
+      "matchPackageNames": [
+        "rust",
+        "docker.io/library/rust"
+      ],
+      "groupName": "rust version",
+      "separateMinorPatch": true,
+      "rangeStrategy": "bump",
+      "commitMessageTopic": "rust",
+      "commitMessageExtra": "to {{{newVersion}}}"
+    },
+    {
+      "matchPackageNames": [
+        "python",
+        "docker.io/library/python",
+        "ghcr.io/astral-sh/uv"
+      ],
+      "groupName": "python version",
+      "separateMinorPatch": true,
+      "rangeStrategy": "bump",
+      "commitMessageTopic": "python",
+      "commitMessageExtra": "to {{{newVersion}}}"
+    },
+    {
+      "description": "Force Python minor versioning for pyproject.toml",
+      "matchPackageNames": [
+        "python",
+        "docker.io/library/python"
+      ],
+      "matchFiles": [
+        "pyproject.toml"
+      ],
+      "extractVersion": "^(?<version>\\d+\\.\\d+)"
+    }
+  ]
 }
