@@ -20,8 +20,8 @@ build-backend = "setuptools.build_meta"
 
 [dependency-groups]
 dev = [
-    "mypy>=1.14.1",
     "pytest>=8.3.4",
+    "ty>=0.0.35",
 ]
 
 [project.urls]

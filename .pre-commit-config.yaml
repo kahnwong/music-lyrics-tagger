@@ -20,6 +20,6 @@ repos:
       - id: ruff-check
       - id: ruff-format
       - id: uv-lock
-        #      - id: mypy
+      - id: ty
       - id: yamlfmt
       - id: kingfisher
